@@ -1,5 +1,5 @@
-export const SUPABASE_URL = "https://YOUR_PROJECT_REF.supabase.co";
-export const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+export const SUPABASE_URL = "https://hohfoouwwhtsmicvsoen.supabase.co";
+export const SUPABASE_ANON_KEY = "sb_publishable_MbAyiQd2vNZtC-7Cb7Px2Q_LNhc99mP";
 export const PAYSTACK_PUBLIC_KEY = "pk_test_REPLACE_WITH_PAYSTACK_PUBLIC_KEY";
 
 export const BUSINESS = {
