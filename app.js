@@ -73,9 +73,6 @@ let deliveryFee = 0;
 let totalAmount = 0;
 let resumeData = null;
 
-const themeToggle = document.getElementById('themeToggle');
-const themeToggleSun = document.getElementById('themeToggleSun');
-const themeToggleMoon = document.getElementById('themeToggleMoon');
 const atsCvForm = document.getElementById('atsCvForm');
 const atsCvModal = document.getElementById('atsCvModal');
 const serviceSelect = document.getElementById('serviceSelect');
@@ -120,6 +117,9 @@ function applyTheme(theme) {
   document.body.classList.toggle('dark', isDark);
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
 
+  const themeToggleSun = document.getElementById('themeToggleSun');
+  const themeToggleMoon = document.getElementById('themeToggleMoon');
+  
   if (themeToggleSun && themeToggleMoon) {
     themeToggleSun.classList.toggle('hidden', !isDark);
     themeToggleMoon.classList.toggle('hidden', isDark);
@@ -127,6 +127,7 @@ function applyTheme(theme) {
 }
 
 function bindThemeToggle() {
+  const themeToggle = document.getElementById('themeToggle');
   if (!themeToggle) return;
 
   themeToggle.addEventListener('click', () => {
