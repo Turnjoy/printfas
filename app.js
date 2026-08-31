@@ -136,15 +136,15 @@ function applyTheme(theme) {
 }
 
 function bindThemeToggle() {
-  const themeToggle = document.getElementById('themeToggle');
-  console.log('Theme toggle button found:', !!themeToggle);
-  if (!themeToggle) {
-    console.error('Theme toggle button not found!');
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  console.log('Dark mode toggle button found:', !!darkModeToggle);
+  if (!darkModeToggle) {
+    console.error('Dark mode toggle button not found!');
     return;
   }
 
-  themeToggle.addEventListener('click', () => {
-    console.log('Theme toggle clicked');
+  darkModeToggle.addEventListener('click', () => {
+    console.log('Dark mode toggle clicked');
     const currentIsDark = document.documentElement.classList.contains('dark');
     console.log('Current dark state:', currentIsDark);
     const nextTheme = currentIsDark ? 'light' : 'dark';
