@@ -160,7 +160,7 @@
                     <img src="./assets/logo.jpg" alt="PRINTFAS logo" class="brand-logo" onerror="this.style.display='none'" />
                     <div>
                         <h1 class="text-xl font-bold">PRINTFAS</h1>
-                        <p class="text-xs text-blue-200">Express Document Printing</p>
+                        <p class="text-xs text-blue-100">Express Document Printing</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -175,7 +175,7 @@
                     <button id="installAppBtn" class="hidden bg-white text-brand px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition">
                         Install App
                     </button>
-                    <a href="#track" class="text-white hover:text-blue-200 transition">
+                    <a href="#track" class="text-white hover:text-blue-200 transition" aria-label="Track Order">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
@@ -223,7 +223,7 @@
                 
                 <!-- Service Selection -->
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 dark:text-slate-200 mb-3">Select Service</label>
+                    <label for="serviceSelect" class="block text-sm font-semibold text-gray-700 dark:text-slate-200 mb-3">Select Service</label>
                     <select id="serviceSelect" class="w-full p-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-brand dark:bg-slate-800 dark:text-white">
                         <option value="">Choose a service</option>
                     </select>
@@ -237,7 +237,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                         </svg>
                         <p class="text-gray-600 mb-2">Drag & drop files here or click to select</p>
-                        <p class="text-sm text-gray-400">PDF, DOCX, PNG, JPG (Max 25MB per file)</p>
+                        <p class="text-sm text-gray-500">PDF, DOCX, PNG, JPG (Max 25MB per file)</p>
                         <input type="file" id="fileInput" multiple accept=".pdf,.docx,.png,.jpg,.jpeg" class="hidden">
                     </div>
                     
