@@ -106,19 +106,28 @@ function populateServiceDropdown() {
 
 function getSavedTheme() {
   const saved = localStorage.getItem('theme');
+  console.log('Saved theme from localStorage:', saved);
   if (saved === 'dark' || saved === 'light') return saved;
 
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  console.log('System prefers dark:', systemPrefersDark);
+  return systemPrefersDark ? 'dark' : 'light';
 }
 
 function applyTheme(theme) {
+  console.log('Applying theme:', theme);
   const isDark = theme === 'dark';
   document.documentElement.classList.toggle('dark', isDark);
   document.body.classList.toggle('dark', isDark);
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  
+  console.log('Dark class on html:', document.documentElement.classList.contains('dark'));
+  console.log('Dark class on body:', document.body.classList.contains('dark'));
 
   const themeToggleSun = document.getElementById('themeToggleSun');
   const themeToggleMoon = document.getElementById('themeToggleMoon');
+  
+  console.log('Sun icon found:', !!themeToggleSun, 'Moon icon found:', !!themeToggleMoon);
   
   if (themeToggleSun && themeToggleMoon) {
     themeToggleSun.classList.toggle('hidden', !isDark);
@@ -128,10 +137,18 @@ function applyTheme(theme) {
 
 function bindThemeToggle() {
   const themeToggle = document.getElementById('themeToggle');
-  if (!themeToggle) return;
+  console.log('Theme toggle button found:', !!themeToggle);
+  if (!themeToggle) {
+    console.error('Theme toggle button not found!');
+    return;
+  }
 
   themeToggle.addEventListener('click', () => {
-    const nextTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+    console.log('Theme toggle clicked');
+    const currentIsDark = document.documentElement.classList.contains('dark');
+    console.log('Current dark state:', currentIsDark);
+    const nextTheme = currentIsDark ? 'light' : 'dark';
+    console.log('Switching to:', nextTheme);
     applyTheme(nextTheme);
   });
 }
