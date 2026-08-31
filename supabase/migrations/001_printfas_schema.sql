@@ -45,7 +45,9 @@ create table if not exists public.orders (
   upload_channel public.upload_channel not null default 'web',
   file_path text,
   file_paths jsonb not null default '[]'::jsonb,
+  files jsonb not null default '[]'::jsonb,
   proof_path text,
+  resume_data jsonb,
   delivery_option public.delivery_option not null default 'pickup',
   delivery_address text,
   delivery_fee numeric(12,2) not null default 0 check (delivery_fee >= 0),
@@ -65,7 +67,9 @@ alter table public.orders
   add column if not exists copies integer not null default 1 check (copies > 0),
   add column if not exists add_ons jsonb not null default '[]'::jsonb,
   add column if not exists customer_note text,
-  add column if not exists file_paths jsonb not null default '[]'::jsonb;
+  add column if not exists file_paths jsonb not null default '[]'::jsonb,
+  add column if not exists files jsonb not null default '[]'::jsonb,
+  add column if not exists resume_data jsonb;
 
 create table if not exists public.order_messages (
   id uuid primary key default gen_random_uuid(),

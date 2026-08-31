@@ -261,6 +261,26 @@ function buildResumePayload() {
   return payload;
 }
 
+async function detectPdfPageCount(file) {
+  if (!file || !file.name || !file.name.toLowerCase().endsWith('.pdf')) {
+    return 1;
+  }
+
+  try {
+    const pdfjsLib = window.pdfjsLib;
+    if (!pdfjsLib || !pdfjsLib.getDocument) {
+      return 1;
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    return pdf.numPages || 1;
+  } catch (error) {
+    console.warn('Unable to auto-detect PDF page count for', file.name, error);
+    return 1;
+  }
+}
+
 if (atsCvForm) {
   atsCvForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -340,25 +360,29 @@ if (document.getElementById('addAnotherFile')) {
   document.getElementById('addAnotherFile').addEventListener('click', () => fileInput.click());
 }
 
-function handleFiles(files) {
+async function handleFiles(files) {
   const maxSize = 25 * 1024 * 1024;
   let hasLargeFile = false;
+  const newFiles = [];
 
-  Array.from(files).forEach((file) => {
+  for (const file of Array.from(files)) {
     if (file.size > maxSize) {
       hasLargeFile = true;
     }
 
-    uploadedFiles.push({
+    const detectedPages = await detectPdfPageCount(file);
+    newFiles.push({
       id: Date.now() + Math.random(),
       file,
       name: file.name,
       size: (file.size / (1024 * 1024)).toFixed(2),
-      pages: 1,
+      pages: detectedPages,
       copies: 1,
       instructions: ''
     });
-  });
+  }
+
+  uploadedFiles.push(...newFiles);
 
   if (hasLargeFile && largeFileNotice) {
     largeFileNotice.classList.remove('hidden');
@@ -387,6 +411,7 @@ function renderFileQueue() {
         <div class="flex-1">
           <div class="font-semibold text-gray-800 dark:text-white">${fileData.name}</div>
           <div class="text-sm text-gray-500 dark:text-slate-300">${fileData.size} MB</div>
+          <div class="text-xs text-blue-600 dark:text-blue-300">Auto-detected: ${fileData.pages} page(s)</div>
         </div>
         <button type="button" class="text-red-500 hover:text-red-700" onclick="removeFile(${index})">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -405,8 +430,8 @@ function renderFileQueue() {
         </div>
       </div>
       <div>
-        <label class="block text-xs text-gray-600 dark:text-slate-300 mb-1">Special Instructions</label>
-        <input type="text" placeholder="e.g., Print pages 1-5 only, Double-sided" value="${fileData.instructions}" onchange="updateFileData(${index}, 'instructions', this.value)" class="w-full p-2 border rounded text-sm dark:bg-slate-900 dark:text-white dark:border-slate-700">
+        <label class="block text-xs text-gray-600 dark:text-slate-300 mb-1">Admin Instructions</label>
+        <input type="text" placeholder="Leave blank to print all pages by default" value="${fileData.instructions}" onchange="updateFileData(${index}, 'instructions', this.value)" class="w-full p-2 border rounded text-sm dark:bg-slate-900 dark:text-white dark:border-slate-700">
       </div>
     `;
     fileList.appendChild(fileItem);
@@ -544,7 +569,7 @@ document.getElementById('submitOrder').addEventListener('click', async () => {
           name: fileData.name,
           pages: fileData.pages,
           copies: fileData.copies,
-          instructions: fileData.instructions
+          instructions: (fileData.instructions || '').trim() || 'Print all pages by default'
         })),
         delivery_option: deliveryOption,
         delivery_address: deliveryAddress,
@@ -566,12 +591,14 @@ document.getElementById('submitOrder').addEventListener('click', async () => {
       const { error: uploadError } = await supabase.storage.from('print-jobs').upload(filePath, fileData.file);
       if (uploadError) throw uploadError;
 
+      const normalizedInstructions = (fileData.instructions || '').trim();
+
       return {
         name: fileData.name,
         path: filePath,
         pages: fileData.pages,
         copies: fileData.copies,
-        instructions: fileData.instructions
+        instructions: normalizedInstructions || 'Print all pages by default'
       };
     });
 
