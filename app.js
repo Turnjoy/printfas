@@ -79,90 +79,32 @@ const themeToggleMoon = document.getElementById('themeToggleMoon');
 const atsCvForm = document.getElementById('atsCvForm');
 const atsCvModal = document.getElementById('atsCvModal');
 const serviceSelect = document.getElementById('serviceSelect');
-const serviceOptions = document.getElementById('serviceOptions');
 
-function renderServiceOptions() {
-  if (!serviceOptions) return;
+function populateServiceDropdown() {
+  if (!serviceSelect) return;
 
-  serviceOptions.innerHTML = PRINTFAS_PRICELIST.map((item) => `
-    <button
-      type="button"
-      class="service-btn p-4 border-2 border-gray-200 rounded-lg hover:border-brand transition text-left bg-white dark:bg-slate-800 dark:text-white dark:border-slate-700"
-      data-service-id="${item.id}"
-      data-service-name="${item.name}"
-      data-service-price="${item.price}"
-      data-service-size="${item.category === 'A4' ? 'a4' : item.category === 'A3' ? 'a3' : 'none'}"
-    >
-      <div class="font-semibold text-gray-800 dark:text-white">${item.name}</div>
-      <div class="text-sm text-gray-500 dark:text-slate-300">${item.price > 0 ? '₦' + item.price.toLocaleString() : 'Quote required'}</div>
-    </button>
+  serviceSelect.innerHTML = PRINTFAS_PRICELIST.map((item) => `
+    <option value="${item.id}">${item.name} ${item.price > 0 ? `- ₦${item.price.toLocaleString()}` : '- Quote required'}</option>
   `).join('');
 
-  document.querySelectorAll('.service-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.service-btn').forEach((b) => {
-        b.classList.remove('border-brand', 'bg-blue-50', 'dark:bg-slate-700');
-        b.classList.add('border-gray-200', 'dark:border-slate-700');
-      });
+  serviceSelect.addEventListener('change', (event) => {
+    const value = event.target.value;
+    const picked = PRINTFAS_PRICELIST.find((service) => service.id === value) || null;
+    selectedService = picked ? {
+      id: picked.id,
+      name: picked.name,
+      price: picked.price,
+      size: picked.category === 'A4' ? 'a4' : picked.category === 'A3' ? 'a3' : 'none',
+      type: picked.type
+    } : null;
 
-      btn.classList.remove('border-gray-200', 'dark:border-slate-700');
-      btn.classList.add('border-brand', 'bg-blue-50', 'dark:bg-slate-700');
+    if (selectedService && selectedService.id === 'ats_cv') {
+      openAtsCvModal();
+    }
 
-      selectedService = {
-        id: btn.dataset.serviceId,
-        name: btn.dataset.serviceName,
-        price: Number(btn.dataset.servicePrice),
-        size: btn.dataset.serviceSize,
-        type: btn.dataset.serviceId === 'ats_cv' ? 'form_required' : 'standard'
-      };
-
-      if (serviceSelect) {
-        serviceSelect.value = btn.dataset.serviceId;
-      }
-
-      if (selectedService.id === 'ats_cv') {
-        openAtsCvModal();
-      }
-
-      updateFinishingOptions();
-      calculateTotal();
-    });
+    updateFinishingOptions();
+    calculateTotal();
   });
-
-  if (serviceSelect) {
-    serviceSelect.innerHTML = PRINTFAS_PRICELIST.map((item) => `
-      <option value="${item.id}">${item.name} ${item.price > 0 ? `- ₦${item.price.toLocaleString()}` : '- Quote required'}</option>
-    `).join('');
-
-    serviceSelect.addEventListener('change', (event) => {
-      const value = event.target.value;
-      const picked = PRINTFAS_PRICELIST.find((service) => service.id === value) || null;
-      selectedService = picked ? {
-        id: picked.id,
-        name: picked.name,
-        price: picked.price,
-        size: picked.category === 'A4' ? 'a4' : picked.category === 'A3' ? 'a3' : 'none',
-        type: picked.type
-      } : null;
-
-      const btn = document.querySelector(`[data-service-id="${value}"]`);
-      if (btn) {
-        document.querySelectorAll('.service-btn').forEach((b) => {
-          b.classList.remove('border-brand', 'bg-blue-50', 'dark:bg-slate-700');
-          b.classList.add('border-gray-200', 'dark:border-slate-700');
-        });
-        btn.classList.remove('border-gray-200', 'dark:border-slate-700');
-        btn.classList.add('border-brand', 'bg-blue-50', 'dark:bg-slate-700');
-      }
-
-      if (selectedService && selectedService.id === 'ats_cv') {
-        openAtsCvModal();
-      }
-
-      updateFinishingOptions();
-      calculateTotal();
-    });
-  }
 }
 
 function getSavedTheme() {
@@ -824,7 +766,7 @@ if ('serviceWorker' in navigator) {
 
 window.addEventListener('DOMContentLoaded', () => {
   applyTheme(getSavedTheme());
-  renderServiceOptions();
+  populateServiceDropdown();
   bindThemeToggle();
   initPriceListDarkMode();
   updateFinishingOptions();
