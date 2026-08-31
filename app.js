@@ -49,6 +49,15 @@ const PRINTFAS_PRICELIST = [
 
 const SUPABASE_URL = (window.__PRINTFAS_CONFIG__ && window.__PRINTFAS_CONFIG__.supabaseUrl) || 'https://placeholder.supabase.co';
 const SUPABASE_ANON_KEY = (window.__PRINTFAS_CONFIG__ && window.__PRINTFAS_CONFIG__.supabaseAnonKey) || 'placeholder-key';
+
+const BUSINESS_INFO = {
+  name: "PRINTFAS",
+  bankAccounts: [
+    { bank: "FCMB", number: "2008391004", name: "Corporate PC Ltd" },
+    { bank: "First Bank", number: "2015124252", name: "Corporate PC Ltd" }
+  ]
+};
+
 const supabase = (window.supabase && typeof window.supabase.createClient === 'function' && SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'placeholder-key')
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
@@ -475,11 +484,26 @@ document.querySelectorAll('input[name="payment"]').forEach((radio) => {
     const bankDetails = document.getElementById('bankDetails');
     if (event.target.value === 'bank') {
       bankDetails.classList.remove('hidden');
+      renderBankAccounts();
     } else {
       bankDetails.classList.add('hidden');
     }
   });
 });
+
+function renderBankAccounts() {
+  const bankAccountsList = document.getElementById('bankAccountsList');
+  if (!bankAccountsList) return;
+
+  bankAccountsList.innerHTML = BUSINESS_INFO.bankAccounts.map((account) => `
+    <div class="flex justify-between">
+      <span class="text-gray-600 dark:text-slate-300">${account.bank}:</span>
+      <span class="font-mono font-semibold text-gray-800 dark:text-white">${account.number}</span>
+    </div>
+  `).join('') + `
+    <div class="text-gray-600 dark:text-slate-300 text-xs mt-2">Account Name: ${BUSINESS_INFO.bankAccounts[0].name}</div>
+  `;
+}
 
 function calculateTotal() {
   let filesCost = 0;
