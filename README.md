@@ -74,21 +74,22 @@ Replace the placeholder icons in the `icons/` directory:
 - `icon-192x192.png` (192x192 pixels)
 - `icon-512x512.png` (512x512 pixels)
 
-### 6. Update Configuration
+### 6. Update Runtime Configuration
 
-Update the Supabase credentials in both JavaScript files:
+Set the app configuration in the HTML entry pages before the module scripts load:
 
-**In `app.js`:**
-```javascript
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+**In `index.html` and `admin.html`:**
+```html
+<script>
+  window.__PRINTFAS_CONFIG__ = {
+    supabaseUrl: 'YOUR_SUPABASE_URL',
+    supabaseAnonKey: 'YOUR_SUPABASE_ANON_KEY',
+    paystackPublicKey: 'YOUR_PAYSTACK_PUBLIC_KEY'
+  };
+</script>
 ```
 
-**In `admin.js`:**
-```javascript
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-```
+> The project also includes the live fallback values in the config helper, but production deployment should always use the project-specific keys from your Supabase and Paystack dashboard.
 
 ### 7. Deploy to Cloudflare Pages
 
