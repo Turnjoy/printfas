@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRINTFAS Admin Dashboard</title>
+    <meta name="description" content="Admin Dashboard for PRINTFAS Express Printing">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    
+    <!-- Tailwind CSS -->
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = { darkMode: 'class' };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    
+    <style>
+        :root {
+            --brand-primary: #2563eb;
+            --brand-secondary: #1e40af;
+            --brand-accent: #3b82f6;
+        }
+        
+        .btn-primary {
+            background-color: var(--brand-primary);
+        }
+        .btn-primary:hover {
+            background-color: var(--brand-secondary);
+        }
+        
+        .bg-brand {
+            background-color: var(--brand-primary);
+        }
+        
+        .text-brand {
+            color: var(--brand-primary);
+        }
+        
+        .border-brand {
+            border-color: var(--brand-primary);
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-received { background-color: #fef3c7; color: #92400e; }
+        .status-processing { background-color: #dbeafe; color: #1e40af; }
+        .status-printing { background-color: #e0e7ff; color: #3730a3; }
+        .status-ready { background-color: #d1fae5; color: #065f46; }
+        .status-out_for_delivery { background-color: #fce7f3; color: #9d174d; }
+        .status-completed { background-color: #dcfce7; color: #166534; }
+        
+        .delivery-pickup { background-color: #e0f2fe; color: #0369a1; }
+        .delivery-delivery { background-color: #fef3c7; color: #92400e; }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Login Section -->
+    <div id="loginSection" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-brand rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <span class="text-white font-bold text-2xl">PF</span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">PRINTFAS Admin</h1>
+                <p class="text-gray-500">Sign in to access the dashboard</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                    <input type="email" id="loginEmail" required 
+                           class="w-full p-3 border rounded-lg focus:outline-none focus:border-brand"
+                           placeholder="admin@printfas.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                    <input type="password" id="loginPassword" required 
+                           class="w-full p-3 border rounded-lg focus:outline-none focus:border-brand"
+                           placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full btn-primary text-white py-3 rounded-lg font-semibold hover:bg-brand-secondary transition flex items-center justify-center">
+                    <span id="loginText">Sign In</span>
+                    <div id="loginSpinner" class="spinner ml-2 hidden"></div>
+                </button>
+            </form>
+            
+            <div id="loginError" class="hidden mt-4 bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
+                Invalid credentials or insufficient permissions
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="hidden">
+        <!-- Header -->
+        <header class="bg-brand text-white shadow-lg">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                            <span class="text-brand font-bold text-xl">PF</span>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold">PRINTFAS Admin</h1>
+                            <p class="text-xs text-blue-200">Order Management Dashboard</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button id="adminThemeToggle" type="button" class="p-2 rounded-full border border-white/30 bg-white/10 text-white hover:bg-white/20 transition" aria-label="Toggle dark mode">
+                            <svg id="adminThemeSun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <svg id="adminThemeMoon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </button>
+                        <span id="adminEmail" class="text-sm text-blue-200"></span>
+                        <button id="logoutBtn" class="bg-white text-brand px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Total Orders</p>
+                            <p id="totalOrders" class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Pending</p>
+                            <p id="pendingOrders" class="text-2xl font-bold text-yellow-600">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Processing</p>
+                            <p id="processingOrders" class="text-2xl font-bold text-blue-600">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Completed</p>
+                            <p id="completedOrders" class="text-2xl font-bold text-green-600">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-gray-800">Order Management</h2>
+                        <div class="flex space-x-3">
+                            <select id="statusFilter" class="p-2 border rounded-lg focus:outline-none focus:border-brand">
+                                <option value="">All Status</option>
+                                <option value="received">Received</option>
+                                <option value="processing">Processing</option>
+                                <option value="printing">Printing</option>
+                                <option value="ready">Ready</option>
+                                <option value="out_for_delivery">Out for Delivery</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                            <button id="refreshBtn" class="btn-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-secondary transition">
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Ref</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Files</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Orders will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="emptyState" class="hidden p-12 text-center">
+                    <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <p class="text-gray-500">No orders found</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderModal" class="modal">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Order Details</h3>
+                <button id="closeOrderModal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="orderModalContent" class="p-6">
+                <!-- Order details will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Modal -->
+    <div id="quoteModal" class="modal">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Send Custom Quote</h3>
+                <button id="closeQuoteModal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="quoteForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Order Reference</label>
+                        <input type="text" id="quoteOrderRef" readonly class="w-full p-3 border rounded-lg bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Customer Email</label>
+                        <input type="email" id="quoteEmail" readonly class="w-full p-3 border rounded-lg bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Quoted Amount (₦)</label>
+                        <input type="number" id="quoteAmount" required min="0" class="w-full p-3 border rounded-lg focus:outline-none focus:border-brand">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Notes</label>
+                        <textarea id="quoteNotes" rows="3" class="w-full p-3 border rounded-lg focus:outline-none focus:border-brand" placeholder="Additional notes for the customer"></textarea>
+                    </div>
+                    <button type="submit" class="w-full btn-primary text-white py-3 rounded-lg font-semibold hover:bg-brand-secondary transition">
+                        Send Quote & Payment Link
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="resumeInfoDrawer" class="fixed top-0 right-0 z-50 h-full w-full max-w-xl translate-x-full overflow-y-auto border-l border-slate-200 bg-white p-6 shadow-2xl transition-transform duration-300 dark:border-slate-700 dark:bg-slate-900">
+        <div class="mb-4 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Resume Information</h3>
+            <button id="closeResumeDrawer" type="button" class="text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="mb-4 flex gap-3">
+            <button id="copyResumeText" type="button" class="btn-primary text-white px-4 py-2 rounded-lg text-sm font-semibold">Copy All as Text</button>
+            <button id="printResumeBtn" type="button" class="bg-slate-200 text-slate-800 px-4 py-2 rounded-lg text-sm font-semibold dark:bg-slate-700 dark:text-white">Print</button>
+        </div>
+        <div id="resumeInfoContent" class="space-y-4"></div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
