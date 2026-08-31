@@ -31,6 +31,23 @@
             --brand-accent: #3b82f6;
         }
         
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 12px;
+            display: block;
+            background: white;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+            flex-shrink: 0;
+        }
+
+        html.dark .brand-logo,
+        body.dark .brand-logo {
+            background: #f8fafc;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+        }
+
         .btn-primary {
             background-color: var(--brand-primary);
         }
@@ -140,9 +157,7 @@
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                        <span class="text-brand font-bold text-xl">PF</span>
-                    </div>
+                    <img src="/assets/logo.jpg" alt="PRINTFAS logo" class="brand-logo" />
                     <div>
                         <h1 class="text-xl font-bold">PRINTFAS</h1>
                         <p class="text-xs text-blue-200">Express Document Printing</p>

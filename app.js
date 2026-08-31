@@ -166,6 +166,7 @@ function getSavedTheme() {
 function applyTheme(theme) {
   const isDark = theme === 'dark';
   document.documentElement.classList.toggle('dark', isDark);
+  document.body.classList.toggle('dark', isDark);
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
 
   if (themeToggleSun && themeToggleMoon) {
