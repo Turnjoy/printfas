@@ -103,6 +103,175 @@ body.dark .shadow-xl {
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.45);
 }
 
+/* Dark mode status badges */
+html.dark .status-received,
+body.dark .status-received {
+  background-color: #1e3a5f;
+  color: #93c5fd;
+}
+
+html.dark .status-processing,
+body.dark .status-processing {
+  background-color: #422006;
+  color: #fcd34d;
+}
+
+html.dark .status-printing,
+body.dark .status-printing {
+  background-color: #312e81;
+  color: #a5b4fc;
+}
+
+html.dark .status-ready,
+body.dark .status-ready {
+  background-color: #064e3b;
+  color: #6ee7b7;
+}
+
+html.dark .status-out_for_delivery,
+body.dark .status-out_for_delivery {
+  background-color: #4a044e;
+  color: #f9a8d4;
+}
+
+html.dark .status-completed,
+body.dark .status-completed {
+  background-color: #14532d;
+  color: #86efac;
+}
+
+/* Dark mode delivery badges */
+html.dark .delivery-pickup,
+body.dark .delivery-pickup {
+  background-color: #0c4a6e;
+  color: #7dd3fc;
+}
+
+html.dark .delivery-doorstep,
+body.dark .delivery-doorstep {
+  background-color: #581c87;
+  color: #d8b4fe;
+}
+
+/* Dark mode file queue items */
+html.dark .file-queue-item,
+body.dark .file-queue-item {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+html.dark .file-queue-item:hover,
+body.dark .file-queue-item:hover {
+  border-color: var(--brand-primary);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Dark mode large file notice */
+html.dark .large-file-notice,
+body.dark .large-file-notice {
+  background-color: #422006;
+  border-color: #b45309;
+}
+
+/* Dark mode inputs */
+html.dark input,
+html.dark select,
+html.dark textarea,
+body.dark input,
+body.dark select,
+body.dark textarea {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+html.dark input::placeholder,
+html.dark select::placeholder,
+html.dark textarea::placeholder,
+body.dark input::placeholder,
+body.dark select::placeholder,
+body.dark textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus,
+body.dark input:focus,
+body.dark select:focus,
+body.dark textarea:focus {
+  border-color: var(--brand-primary);
+  outline-color: var(--brand-primary);
+}
+
+/* Dark mode dropdown zone */
+html.dark .drop-zone,
+body.dark .drop-zone {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+html.dark .drop-zone.dragover,
+body.dark .drop-zone.dragover {
+  background-color: rgba(37, 99, 235, 0.2);
+  border-color: var(--brand-primary);
+}
+
+/* Dark mode buttons */
+html.dark .btn-primary,
+body.dark .btn-primary {
+  background-color: var(--brand-primary);
+  color: white;
+}
+
+html.dark .btn-primary:hover,
+body.dark .btn-primary:hover {
+  background-color: var(--brand-secondary);
+}
+
+html.dark .btn-secondary,
+body.dark .btn-secondary {
+  background-color: var(--brand-accent);
+  color: white;
+}
+
+html.dark .btn-secondary:hover,
+body.dark .btn-secondary:hover {
+  background-color: #d97706;
+}
+
+/* Dark mode header */
+html.dark header,
+body.dark header {
+  background-color: var(--bg-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+/* Dark mode footer */
+html.dark footer,
+body.dark footer {
+  background-color: var(--bg-secondary);
+  border-top-color: var(--border-color);
+}
+
+/* Dark mode modal backgrounds */
+html.dark .bg-white,
+body.dark .bg-white {
+  background-color: var(--bg-secondary);
+}
+
+/* Dark mode price summary */
+html.dark .bg-gray-50,
+body.dark .bg-gray-50 {
+  background-color: var(--bg-tertiary);
+}
+
+/* Dark mode brand text */
+html.dark .text-brand,
+body.dark .text-brand {
+  color: var(--brand-primary);
+}
+
 .btn-primary {
   background-color: var(--brand-primary);
   color: white;
