@@ -58,11 +58,11 @@ const BUSINESS_INFO = {
   ]
 };
 
-const supabase = (window.supabase && typeof window.supabase.createClient === 'function' && SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'placeholder-key')
+const supabaseClient = (window.supabase && typeof window.supabase.createClient === 'function' && SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'placeholder-key')
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
 
-if (!supabase) {
+if (!supabaseClient) {
   console.warn('Supabase is not configured. The storefront will run in demo mode without database submission.');
 }
 
@@ -544,7 +544,7 @@ document.getElementById('submitOrder').addEventListener('click', async () => {
   submitSpinner.classList.remove('hidden');
 
   try {
-    const { data: order, error: orderError } = await supabase
+    const { data: order, error: orderError } = await supabaseClient
       .from('orders')
       .insert([{
         service_type: selectedService.name,
@@ -573,7 +573,7 @@ document.getElementById('submitOrder').addEventListener('click', async () => {
     const uploadPromises = uploadedFiles.map(async (fileData) => {
       const timestamp = Date.now();
       const filePath = `orders/${orderRef}/${timestamp}_${fileData.name}`;
-      const { error: uploadError } = await supabase.storage.from('print-jobs').upload(filePath, fileData.file);
+      const { error: uploadError } = await supabaseClient.storage.from('print-jobs').upload(filePath, fileData.file);
       if (uploadError) throw uploadError;
 
       const normalizedInstructions = (fileData.instructions || '').trim();
@@ -589,7 +589,7 @@ document.getElementById('submitOrder').addEventListener('click', async () => {
 
     const uploadedFileData = await Promise.all(uploadPromises);
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseClient
       .from('orders')
       .update({ files: uploadedFileData })
       .eq('id', order.id);
@@ -597,7 +597,7 @@ document.getElementById('submitOrder').addEventListener('click', async () => {
     if (updateError) throw updateError;
 
     if (paymentMethod === 'paystack') {
-      const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
+      const { data: checkoutData, error: checkoutError } = await supabaseClient.functions.invoke('create-checkout', {
         body: {
           orderId: order.id,
           email,
@@ -641,7 +641,7 @@ document.getElementById('trackOrder').addEventListener('click', async () => {
   }
 
   try {
-    const { data: order, error } = await supabase
+    const { data: order, error } = await supabaseClient
       .from('orders')
       .select('*')
       .eq('order_ref', orderRef)
