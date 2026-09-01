@@ -106,28 +106,18 @@ function populateServiceDropdown() {
 
 function getSavedTheme() {
   const saved = localStorage.getItem('theme');
-  console.log('Saved theme from localStorage:', saved);
   if (saved === 'dark' || saved === 'light') return saved;
-
-  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  console.log('System prefers dark:', systemPrefersDark);
-  return systemPrefersDark ? 'dark' : 'light';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function applyTheme(theme) {
-  console.log('Applying theme:', theme);
   const isDark = theme === 'dark';
   document.documentElement.classList.toggle('dark', isDark);
   document.body.classList.toggle('dark', isDark);
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  
-  console.log('Dark class on html:', document.documentElement.classList.contains('dark'));
-  console.log('Dark class on body:', document.body.classList.contains('dark'));
 
   const themeToggleSun = document.getElementById('themeToggleSun');
   const themeToggleMoon = document.getElementById('themeToggleMoon');
-  
-  console.log('Sun icon found:', !!themeToggleSun, 'Moon icon found:', !!themeToggleMoon);
   
   if (themeToggleSun && themeToggleMoon) {
     themeToggleSun.classList.toggle('hidden', !isDark);
@@ -136,21 +126,19 @@ function applyTheme(theme) {
 }
 
 function bindThemeToggle() {
-  const darkModeToggle = document.getElementById('darkModeToggle');
-  console.log('Dark mode toggle button found:', !!darkModeToggle);
-  if (!darkModeToggle) {
-    console.error('Dark mode toggle button not found!');
-    return;
+  const toggleBtn = document.getElementById('darkModeToggle');
+  if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
   }
-
-  darkModeToggle.addEventListener('click', () => {
-    console.log('Dark mode toggle clicked');
-    const currentIsDark = document.documentElement.classList.contains('dark');
-    console.log('Current dark state:', currentIsDark);
-    const nextTheme = currentIsDark ? 'light' : 'dark';
-    console.log('Switching to:', nextTheme);
-    applyTheme(nextTheme);
-  });
+  if (toggleBtn) {
+    toggleBtn.onclick = function() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      applyTheme(isDark ? 'dark' : 'light');
+    };
+  }
 }
 
 function initPriceListDarkMode() {
