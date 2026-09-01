@@ -127,17 +127,12 @@ function applyTheme(theme) {
 
 function bindThemeToggle() {
   const toggleBtn = document.getElementById('darkModeToggle');
-  if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
   if (toggleBtn) {
-    toggleBtn.onclick = function() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      applyTheme(isDark ? 'dark' : 'light');
-    };
+    toggleBtn.addEventListener('click', () => {
+      const currentIsDark = document.documentElement.classList.contains('dark');
+      const nextTheme = currentIsDark ? 'light' : 'dark';
+      applyTheme(nextTheme);
+    });
   }
 }
 

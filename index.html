@@ -11,11 +11,12 @@
     <meta name="theme-color" content="#2563eb">
     
     <!-- Tailwind CSS -->
-    <script>
-        window.tailwind = window.tailwind || {};
-        window.tailwind.config = { darkMode: 'class' };
-    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
     
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -539,33 +540,6 @@
             supabaseAnonKey: 'sb_publishable_MbAyiQd2vNZtC-7Cb7Px2Q_LNhc99mP',
             paystackPublicKey: 'pk_test_REPLACE_WITH_PAYSTACK_PUBLIC_KEY'
         };
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const toggleBtn = document.getElementById('darkModeToggle');
-            const sunIcon = document.getElementById('themeToggleSun');
-            const moonIcon = document.getElementById('themeToggleMoon');
-            const html = document.documentElement;
-
-            if (toggleBtn && sunIcon && moonIcon) {
-                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    html.classList.add('dark');
-                    sunIcon.classList.remove('hidden');
-                    moonIcon.classList.add('hidden');
-                }
-
-                toggleBtn.addEventListener('click', () => {
-                    html.classList.toggle('dark');
-                    const isDark = html.classList.contains('dark');
-                    
-                    sunIcon.classList.toggle('hidden', !isDark);
-                    moonIcon.classList.toggle('hidden', isDark);
-                    
-                    localStorage.theme = isDark ? 'dark' : 'light';
-                });
-            }
-        });
     </script>
 
     <script src="app.js"></script>
