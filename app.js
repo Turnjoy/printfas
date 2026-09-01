@@ -362,6 +362,8 @@ const fileList = document.getElementById('fileList');
 const largeFileNotice = document.getElementById('largeFileNotice');
 const photocopyCopies = document.getElementById('photocopyCopies');
 const photocopyType = document.getElementById('photocopyType');
+const enablePhotocopy = document.getElementById('enablePhotocopy');
+const photocopyControls = document.getElementById('photocopyControls');
 
 if (dropZone) {
   dropZone.addEventListener('click', () => fileInput.click());
@@ -382,6 +384,15 @@ if (dropZone) {
 if (fileInput) {
   fileInput.addEventListener('change', (event) => {
     handleFiles(event.target.files);
+  });
+}
+
+if (enablePhotocopy) {
+  enablePhotocopy.addEventListener('change', () => {
+    if (photocopyControls) {
+      photocopyControls.classList.toggle('hidden', !enablePhotocopy.checked);
+    }
+    calculateTotal();
   });
 }
 
@@ -621,9 +632,11 @@ function calculateTotal() {
   }
 
   // Calculate photocopy cost
+  const enablePhotocopy = document.getElementById('enablePhotocopy');
   const photocopyCopies = document.getElementById('photocopyCopies');
   const photocopyType = document.getElementById('photocopyType');
-  if (photocopyCopies && photocopyType) {
+  
+  if (enablePhotocopy && enablePhotocopy.checked && photocopyCopies && photocopyType) {
     const copies = parseInt(photocopyCopies.value) || 0;
     const type = photocopyType.value;
     let photocopyRate = 0;

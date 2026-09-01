@@ -308,14 +308,20 @@
                 <div id="photocopyOptions" class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-slate-200 mb-3">Add Photocopy Copies</label>
                     <div class="space-y-3">
-                        <div class="flex items-center gap-3">
-                            <input type="number" id="photocopyCopies" min="0" value="0" class="w-24 p-2 border rounded-lg dark:bg-slate-800 dark:text-white dark:border-slate-700" placeholder="Copies">
-                            <select id="photocopyType" class="flex-1 p-2 border rounded-lg dark:bg-slate-800 dark:text-white dark:border-slate-700">
-                                <option value="bw">Black & White Photocopy</option>
-                                <option value="colored">Coloured Photocopy</option>
-                            </select>
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-brand transition">
+                            <input type="checkbox" id="enablePhotocopy" class="mr-2">
+                            <span class="text-sm">Enable Photocopy Copies</span>
+                        </label>
+                        <div id="photocopyControls" class="hidden space-y-3">
+                            <div class="flex items-center gap-3">
+                                <input type="number" id="photocopyCopies" min="0" value="0" class="w-24 p-2 border rounded-lg dark:bg-slate-800 dark:text-white dark:border-slate-700" placeholder="Copies">
+                                <select id="photocopyType" class="flex-1 p-2 border rounded-lg dark:bg-slate-800 dark:text-white dark:border-slate-700">
+                                    <option value="bw">Black & White Photocopy</option>
+                                    <option value="colored">Coloured Photocopy</option>
+                                </select>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-slate-400" id="photocopyRate">Rate: ₦100/page (A4 B&W)</p>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-slate-400" id="photocopyRate">Rate: ₦100/page (A4 B&W)</p>
                     </div>
                 </div>
 
