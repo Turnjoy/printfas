@@ -260,6 +260,9 @@ function updateFinishingOptions() {
   const laminatingLabel = document.getElementById('laminatingLabel');
   const bindingLabel = document.getElementById('bindingLabel');
   const bindingTypeContainer = document.getElementById('bindingTypeContainer');
+  const laminatingScopeContainer = document.getElementById('laminatingScopeContainer');
+  const laminatingScope = document.getElementById('laminatingScope');
+  const specificPagesContainer = document.getElementById('specificPagesContainer');
   const photocopyRate = document.getElementById('photocopyRate');
 
   if (!selectedService || selectedService.size === 'none') {
@@ -276,7 +279,7 @@ function updateFinishingOptions() {
   // Update labels based on paper size
   if (laminatingLabel) {
     const lamPrice = size === 'A4' ? 1000 : size === 'A3' ? 1500 : 500;
-    laminatingLabel.textContent = `Laminating (${size}) - ₦${lamPrice}`;
+    laminatingLabel.textContent = `Laminating (${size}) - ₦${lamPrice}/page`;
   }
   
   if (bindingLabel) {
@@ -290,6 +293,32 @@ function updateFinishingOptions() {
   // Update photocopy rate display
   updatePhotocopyRate();
 
+  // Handle laminating checkbox change
+  if (laminatingCheckbox) {
+    laminatingCheckbox.addEventListener('change', () => {
+      if (laminatingScopeContainer) {
+        laminatingScopeContainer.classList.toggle('hidden', !laminatingCheckbox.checked);
+      }
+      calculateTotal();
+    });
+  }
+
+  // Handle laminating scope change
+  if (laminatingScope) {
+    laminatingScope.addEventListener('change', () => {
+      if (specificPagesContainer) {
+        specificPagesContainer.classList.toggle('hidden', laminatingScope.value !== 'specific');
+      }
+      calculateTotal();
+    });
+  }
+
+  // Handle specific pages input change
+  const specificPages = document.getElementById('specificPages');
+  if (specificPages) {
+    specificPages.addEventListener('input', calculateTotal);
+  }
+
   // Handle binding type dropdown visibility
   if (bindingCheckbox) {
     bindingCheckbox.addEventListener('change', () => {
@@ -300,9 +329,10 @@ function updateFinishingOptions() {
     });
   }
 
-  // Handle laminating checkbox change
-  if (laminatingCheckbox) {
-    laminatingCheckbox.addEventListener('change', calculateTotal);
+  // Handle binding type change
+  const bindingType = document.getElementById('bindingType');
+  if (bindingType) {
+    bindingType.addEventListener('change', calculateTotal);
   }
 }
 
@@ -505,6 +535,31 @@ function renderBankAccounts() {
   `;
 }
 
+function parsePageCount(pageInput) {
+  try {
+    const parts = pageInput.split(',').map(p => p.trim());
+    let count = 0;
+    
+    parts.forEach(part => {
+      if (part.includes('-')) {
+        const [start, end] = part.split('-').map(n => parseInt(n.trim()));
+        if (!isNaN(start) && !isNaN(end)) {
+          count += (end - start + 1);
+        }
+      } else {
+        const num = parseInt(part);
+        if (!isNaN(num)) {
+          count += 1;
+        }
+      }
+    });
+    
+    return count > 0 ? count : 0;
+  } catch (e) {
+    return 0;
+  }
+}
+
 function calculateTotal() {
   let filesCost = 0;
   let finishingCost = 0;
@@ -530,11 +585,24 @@ function calculateTotal() {
   const totalPages = uploadedFiles.reduce((sum, file) => sum + (file.pages * file.copies), 0);
   const size = selectedService?.size?.toUpperCase() || 'A4';
 
-  // Calculate laminating cost
+  // Calculate laminating cost based on scope
   const laminatingCheckbox = document.getElementById('laminating');
+  const laminatingScope = document.getElementById('laminatingScope');
+  const specificPages = document.getElementById('specificPages');
+  
   if (laminatingCheckbox && laminatingCheckbox.checked && !laminatingCheckbox.disabled) {
     const lamRate = size === 'A4' ? 1000 : size === 'A3' ? 1500 : 500;
-    finishingCost += lamRate * totalPages;
+    let pagesToLaminate = totalPages;
+    
+    // If specific pages selected, parse and count
+    if (laminatingScope && laminatingScope.value === 'specific' && specificPages) {
+      const pageInput = specificPages.value.trim();
+      if (pageInput) {
+        pagesToLaminate = parsePageCount(pageInput);
+      }
+    }
+    
+    finishingCost += lamRate * pagesToLaminate;
   }
 
   // Calculate binding cost based on page count brackets
