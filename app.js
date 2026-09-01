@@ -255,30 +255,74 @@ if (closeAtsModalBtn) {
 }
 
 function updateFinishingOptions() {
-  const finishingOptions = document.querySelectorAll('.finishing-option');
+  const laminatingCheckbox = document.getElementById('laminating');
+  const bindingCheckbox = document.getElementById('binding');
+  const laminatingLabel = document.getElementById('laminatingLabel');
+  const bindingLabel = document.getElementById('bindingLabel');
+  const bindingTypeContainer = document.getElementById('bindingTypeContainer');
+  const photocopyRate = document.getElementById('photocopyRate');
 
   if (!selectedService || selectedService.size === 'none') {
-    finishingOptions.forEach((opt) => {
-      opt.disabled = true;
-      const wrapper = opt.closest('label');
-      if (wrapper) wrapper.classList.add('opacity-50', 'cursor-not-allowed');
-    });
+    if (laminatingCheckbox) laminatingCheckbox.disabled = true;
+    if (bindingCheckbox) bindingCheckbox.disabled = true;
+    if (laminatingLabel) laminatingLabel.textContent = 'Laminating';
+    if (bindingLabel) bindingLabel.textContent = 'Binding';
+    if (photocopyRate) photocopyRate.textContent = 'Rate: ₦0/page';
     return;
   }
 
-  finishingOptions.forEach((opt) => {
-    const optSize = opt.dataset.size;
-    if (optSize === selectedService.size) {
-      opt.disabled = false;
-      const wrapper = opt.closest('label');
-      if (wrapper) wrapper.classList.remove('opacity-50', 'cursor-not-allowed');
-    } else {
-      opt.disabled = true;
-      opt.checked = false;
-      const wrapper = opt.closest('label');
-      if (wrapper) wrapper.classList.add('opacity-50', 'cursor-not-allowed');
-    }
-  });
+  const size = selectedService.size.toUpperCase();
+  
+  // Update labels based on paper size
+  if (laminatingLabel) {
+    const lamPrice = size === 'A4' ? 1000 : size === 'A3' ? 1500 : 500;
+    laminatingLabel.textContent = `Laminating (${size}) - ₦${lamPrice}`;
+  }
+  
+  if (bindingLabel) {
+    bindingLabel.textContent = `Binding (${size})`;
+  }
+
+  // Enable checkboxes
+  if (laminatingCheckbox) laminatingCheckbox.disabled = false;
+  if (bindingCheckbox) bindingCheckbox.disabled = false;
+
+  // Update photocopy rate display
+  updatePhotocopyRate();
+
+  // Handle binding type dropdown visibility
+  if (bindingCheckbox) {
+    bindingCheckbox.addEventListener('change', () => {
+      if (bindingTypeContainer) {
+        bindingTypeContainer.classList.toggle('hidden', !bindingCheckbox.checked);
+      }
+      calculateTotal();
+    });
+  }
+
+  // Handle laminating checkbox change
+  if (laminatingCheckbox) {
+    laminatingCheckbox.addEventListener('change', calculateTotal);
+  }
+}
+
+function updatePhotocopyRate() {
+  const photocopyType = document.getElementById('photocopyType');
+  const photocopyRate = document.getElementById('photocopyRate');
+  
+  if (!photocopyType || !photocopyRate) return;
+
+  const type = photocopyType.value;
+  const size = selectedService?.size?.toUpperCase() || 'A4';
+  
+  let rate = 0;
+  if (size === 'A4') {
+    rate = type === 'bw' ? 100 : 200;
+  } else if (size === 'A3') {
+    rate = type === 'bw' ? 200 : 400;
+  }
+  
+  photocopyRate.textContent = `Rate: ₦${rate}/page (${size} ${type === 'bw' ? 'B&W' : 'Coloured'})`;
 }
 
 const dropZone = document.getElementById('dropZone');
@@ -286,6 +330,8 @@ const fileInput = document.getElementById('fileInput');
 const fileQueue = document.getElementById('fileQueue');
 const fileList = document.getElementById('fileList');
 const largeFileNotice = document.getElementById('largeFileNotice');
+const photocopyCopies = document.getElementById('photocopyCopies');
+const photocopyType = document.getElementById('photocopyType');
 
 if (dropZone) {
   dropZone.addEventListener('click', () => fileInput.click());
@@ -306,6 +352,17 @@ if (dropZone) {
 if (fileInput) {
   fileInput.addEventListener('change', (event) => {
     handleFiles(event.target.files);
+  });
+}
+
+if (photocopyCopies) {
+  photocopyCopies.addEventListener('input', calculateTotal);
+}
+
+if (photocopyType) {
+  photocopyType.addEventListener('change', () => {
+    updatePhotocopyRate();
+    calculateTotal();
   });
 }
 
@@ -451,6 +508,7 @@ function renderBankAccounts() {
 function calculateTotal() {
   let filesCost = 0;
   let finishingCost = 0;
+  let photocopyCost = 0;
 
   if (selectedService && selectedService.id === 'ats_cv') {
     totalAmount = selectedService.price;
@@ -461,22 +519,58 @@ function calculateTotal() {
     return;
   }
 
+  // Calculate base printing cost
   if (selectedService) {
     uploadedFiles.forEach((file) => {
       filesCost += selectedService.price * file.pages * file.copies;
     });
   }
 
-  document.querySelectorAll('.finishing-option:checked').forEach((opt) => {
-    if (!opt.disabled) {
-      finishingCost += parseInt(opt.dataset.price, 10);
-    }
-  });
+  // Calculate total page count for finishing options
+  const totalPages = uploadedFiles.reduce((sum, file) => sum + (file.pages * file.copies), 0);
+  const size = selectedService?.size?.toUpperCase() || 'A4';
 
-  totalAmount = filesCost + finishingCost + deliveryFee;
+  // Calculate laminating cost
+  const laminatingCheckbox = document.getElementById('laminating');
+  if (laminatingCheckbox && laminatingCheckbox.checked && !laminatingCheckbox.disabled) {
+    const lamRate = size === 'A4' ? 1000 : size === 'A3' ? 1500 : 500;
+    finishingCost += lamRate * totalPages;
+  }
+
+  // Calculate binding cost based on page count brackets
+  const bindingCheckbox = document.getElementById('binding');
+  if (bindingCheckbox && bindingCheckbox.checked && !bindingCheckbox.disabled) {
+    let bindingRate = 0;
+    if (size === 'A4') {
+      if (totalPages <= 100) bindingRate = 1000;
+      else if (totalPages <= 200) bindingRate = 2500;
+      else if (totalPages <= 400) bindingRate = 3000;
+    } else if (size === 'A3') {
+      if (totalPages <= 100) bindingRate = 2000;
+      else if (totalPages <= 200) bindingRate = 3000;
+    }
+    finishingCost += bindingRate;
+  }
+
+  // Calculate photocopy cost
+  const photocopyCopies = document.getElementById('photocopyCopies');
+  const photocopyType = document.getElementById('photocopyType');
+  if (photocopyCopies && photocopyType) {
+    const copies = parseInt(photocopyCopies.value) || 0;
+    const type = photocopyType.value;
+    let photocopyRate = 0;
+    if (size === 'A4') {
+      photocopyRate = type === 'bw' ? 100 : 200;
+    } else if (size === 'A3') {
+      photocopyRate = type === 'bw' ? 200 : 400;
+    }
+    photocopyCost = photocopyRate * copies * totalPages;
+  }
+
+  totalAmount = filesCost + finishingCost + photocopyCost + deliveryFee;
 
   document.getElementById('filesCost').textContent = `₦${filesCost.toLocaleString()}`;
-  document.getElementById('finishingCost').textContent = `₦${finishingCost.toLocaleString()}`;
+  document.getElementById('finishingCost').textContent = `₦${(finishingCost + photocopyCost).toLocaleString()}`;
   document.getElementById('deliveryCost').textContent = `₦${deliveryFee.toLocaleString()}`;
   document.getElementById('totalCost').textContent = `₦${totalAmount.toLocaleString()}`;
 }

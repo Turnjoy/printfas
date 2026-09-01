@@ -274,23 +274,37 @@
                 <!-- Post-Print Finishing Options -->
                 <div id="finishingOptions" class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-slate-200 mb-3">Post-Print Finishing</label>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="space-y-3">
                         <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-brand transition">
-                            <input type="checkbox" id="laminating" class="mr-2 finishing-option" data-size="a4" data-price="150">
-                            <span class="text-sm">Laminating (A4)</span>
+                            <input type="checkbox" id="laminating" class="mr-2 finishing-option">
+                            <span class="text-sm" id="laminatingLabel">Laminating</span>
                         </label>
                         <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-brand transition">
-                            <input type="checkbox" id="binding" class="mr-2 finishing-option" data-size="a4" data-price="200">
-                            <span class="text-sm">Binding (A4)</span>
+                            <input type="checkbox" id="binding" class="mr-2 finishing-option">
+                            <span class="text-sm" id="bindingLabel">Binding</span>
                         </label>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-brand transition">
-                            <input type="checkbox" id="laminatingA3" class="mr-2 finishing-option" data-size="a3" data-price="250">
-                            <span class="text-sm">Laminating (A3)</span>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-brand transition">
-                            <input type="checkbox" id="bindingA3" class="mr-2 finishing-option" data-size="a3" data-price="300">
-                            <span class="text-sm">Binding (A3)</span>
-                        </label>
+                        <div id="bindingTypeContainer" class="hidden mt-2 ml-6">
+                            <label for="bindingType" class="block text-xs text-gray-600 dark:text-slate-300 mb-1">Binding Type</label>
+                            <select id="bindingType" class="w-full p-2 border rounded-lg text-sm dark:bg-slate-800 dark:text-white dark:border-slate-700">
+                                <option value="spiral">Spiral Binding</option>
+                                <option value="slide">Slide / Strip Binding</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photocopy Copies Option -->
+                <div id="photocopyOptions" class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-slate-200 mb-3">Add Photocopy Copies</label>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <input type="number" id="photocopyCopies" min="0" value="0" class="w-24 p-2 border rounded-lg dark:bg-slate-800 dark:text-white dark:border-slate-700" placeholder="Copies">
+                            <select id="photocopyType" class="flex-1 p-2 border rounded-lg dark:bg-slate-800 dark:text-white dark:border-slate-700">
+                                <option value="bw">Black & White Photocopy</option>
+                                <option value="colored">Coloured Photocopy</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-slate-400" id="photocopyRate">Rate: ₦100/page (A4 B&W)</p>
                     </div>
                 </div>
 
