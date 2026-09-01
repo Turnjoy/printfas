@@ -25,6 +25,34 @@ body.dark {
   --input-bg: #1e293b;
 }
 
+/* Global CSS Fallback for Dark Mode */
+html.dark {
+  color-scheme: dark;
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+html.dark body {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+html.dark .bg-white,
+html.dark div[class*="bg-white"],
+html.dark form {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+  border-color: #475569 !important;
+}
+
 * {
   margin: 0;
   padding: 0;

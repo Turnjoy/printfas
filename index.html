@@ -151,7 +151,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 text-gray-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200">
     <!-- Header -->
     <header class="bg-brand text-white shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4">
@@ -316,7 +316,7 @@
                     </div>
                     <div id="deliveryAddress" class="mt-3 hidden">
                         <label for="addressInput" class="sr-only">Delivery Address</label>
-                        <input type="text" id="addressInput" placeholder="Enter your delivery address" autocomplete="street-address" class="w-full p-3 border rounded-lg focus:outline-none focus:border-brand">
+                        <input type="text" id="addressInput" placeholder="Enter your delivery address" autocomplete="street-address" class="w-full p-3 border rounded-lg focus:outline-none focus:border-brand dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder-slate-400">
                     </div>
                 </div>
 
@@ -408,7 +408,7 @@
                 
                 <div class="mb-6">
                     <div class="flex gap-3">
-                        <input type="text" id="orderRefInput" placeholder="Enter Order Reference (e.g., PF-1234)" class="flex-1 p-3 border rounded-lg focus:outline-none focus:border-brand">
+                        <input type="text" id="orderRefInput" placeholder="Enter Order Reference (e.g., PF-1234)" class="flex-1 p-3 border rounded-lg focus:outline-none focus:border-brand dark:bg-slate-800 dark:text-white dark:border-slate-700 dark:placeholder-slate-400">
                         <button id="trackOrder" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-secondary transition">
                             Track
                         </button>
